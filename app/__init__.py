@@ -4,6 +4,8 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from flask_migrate import Migrate
 
+from flask_bootstrap import Bootstrap
+
 db = SQLAlchemy()
 
 login_manager = LoginManager()
@@ -11,6 +13,8 @@ login_manager = LoginManager()
 def create_app():
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_object('config.DevConfig')
+
+    Bootstrap(app)
     db.init_app(app)
 
     login_manager.init_app(app)
