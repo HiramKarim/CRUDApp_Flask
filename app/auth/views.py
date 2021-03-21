@@ -5,7 +5,7 @@ from . import auth
 from .forms import LoginForm, RegistrationForm
 from .. import db
 
-from ..models import Employee
+from ..modelsobj.Employee import Employee
 
 
 @auth.route('/register', methods=['GET', 'POST'])
@@ -17,16 +17,24 @@ def register():
 
     form = RegistrationForm()
     if form.validate_on_submit():
-        employee = Employee(email=form.email.data,
-                            username=form.username.data,
+        employee = Employee(userid=0,
                             first_name=form.first_name.data,
                             last_name=form.last_name.data,
-                            password=form.password.data)
+                            email=form.email.data,
+                            password=form.password.data,
+                            username=form.username.data,
+                            isadmin=True,
+                            departamentid=1,
+                            roleid=1
+                    )
 
         # add employee to the database
-        db.session.add(employee)
-        db.session.commit()
-        flash('You have successfully registered! You may now login.')
+        errortype = employee.insert_employee()
+
+        if errortype != 500:
+            flash('You have successfully registered! You may now login.')
+        else:
+            flash('There was an error trying to register the user.')
 
         # redirect to the login page
         return redirect(url_for('auth.login'))
@@ -47,8 +55,31 @@ def login():
     if form.validate_on_submit():
         # check whether employee exists in the database and whether
         # the password entered matches the password in the database
-        employee = Employee.query.filter_by(email=form.email.data).first()
-        if employee is not None and employee.verify_password(form.password.data):
+
+        row = Employee.find_employee_by_email(form.email.data)
+
+        print(f'employee data {row}')
+
+        if row is None:
+            flash("Email or password are incorrect")
+            return
+
+        employee = Employee(
+            userid=row[0],
+            first_name=row[1],
+            last_name=row[2],
+            email=row[3],
+            password=row[4],
+            username=row[5],
+            isadmin=row[6],
+            departamentid=row[7],
+            roleid=row[8]
+        )
+
+        # employee = Employee.query.filter_by(email=form.email.data).first()
+
+        if employee is not None and employee.verify_password(employee.password, form.password.data):
+
             login_user(employee)
 
             # redirect to the dashbaord page after login
