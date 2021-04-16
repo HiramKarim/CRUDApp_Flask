@@ -24,5 +24,6 @@ class DevConfig(Config):
     DEBUG = True
     TESTING = True
     SECRET_KEY = 'p9Bv<3Eid9%$i01'
-    SQLALCHEMY_DATABASE_URI = 'mysql://root:root@localhost/democrudb'
+    SQLALCHEMY_DATABASE_URI = 'mysql+pymysql://root:Terminator2027@localhost/sqlcrudb'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
     # DATABASE_URI = os.environ.get('DEV_DATABASE_URI')
